@@ -22,7 +22,7 @@ class MapController: UIViewController {
 	private var currentAnnotations: [RegionAnnotation] = []
 
 	private var panelController: FloatingPanelController!
-	private var regionContainerController: RegionContainerController!
+	private var regionPanelController: RegionPanelController!
 
 	var mode: Statistic.Kind = .confirmed {
 		didSet {
@@ -61,7 +61,7 @@ class MapController: UIViewController {
 		super.viewDidAppear(animated)
 
 		panelController.addPanel(toParent: self, animated: true)
-		regionContainerController.regionController.tableView.setContentOffset(.zero, animated: false)
+		regionPanelController.regionDataController.tableView.setContentOffset(.zero, animated: false)
 	}
 
 	override func viewWillDisappear(_ animated: Bool) {
@@ -85,19 +85,27 @@ class MapController: UIViewController {
 			mapView.register(RegionAnnotationView.self,
 							 forAnnotationViewWithReuseIdentifier: RegionAnnotationView.reuseIdentifier)
 		}
+
+		/// Workaround for hiding the iPhone frame that appears on app start
+		#if targetEnvironment(macCatalyst)
+		mapView.isHidden = true
+		DispatchQueue.main.async {
+			self.mapView.isHidden = false
+		}
+		#endif
 	}
 
 	private func initializeBottomSheet() {
-		let identifier = String(describing: RegionContainerController.self)
-		regionContainerController = storyboard?.instantiateViewController(
-			withIdentifier: identifier) as? RegionContainerController
+		let identifier = String(describing: RegionPanelController.self)
+		regionPanelController = storyboard?.instantiateViewController(
+			withIdentifier: identifier) as? RegionPanelController
 
 		panelController = FloatingPanelController()
 		panelController.delegate = self
 		panelController.surfaceView.cornerRadius = 12
 		panelController.surfaceView.shadowHidden = false
-		panelController.set(contentViewController: regionContainerController)
-		panelController.track(scrollView: regionContainerController.regionController.tableView)
+		panelController.set(contentViewController: regionPanelController)
+		panelController.track(scrollView: regionPanelController.regionDataController.tableView)
 		panelController.surfaceView.backgroundColor = .clear
 		panelController.surfaceView.contentView.backgroundColor = .clear
 
@@ -107,8 +115,8 @@ class MapController: UIViewController {
 	}
 
 	func updateRegionScreen(region: Region?) {
-		regionContainerController.regionController.region = region
-		regionContainerController.regionController.update()
+		regionPanelController.regionDataController.region = region
+		regionPanelController.regionDataController.update()
 	}
 
 	func showRegionScreen() {
@@ -132,10 +140,14 @@ class MapController: UIViewController {
 		}
 	}
 
-	func selectAnnotation(for region: Region) {
-		if let annotation = self.currentAnnotations.first(where: { $0.region == region }) {
-			self.mapView.selectAnnotation(annotation, animated: true)
+	func selectAnnotation(for region: Region, onlyIfVisible: Bool = false) {
+		guard let annotation = self.currentAnnotations.first(where: { $0.region == region }) else { return }
+
+		if onlyIfVisible, !mapView.visibleMapRect.contains(MKMapPoint(annotation.coordinate)) {
+			return
 		}
+
+		self.mapView.selectAnnotation(annotation, animated: true)
 	}
 
 	private func update() {
@@ -149,11 +161,13 @@ class MapController: UIViewController {
 
 		currentAnnotations = mapView.zoomLevel > Self.cityZoomLevel ? allAnnotations : countryAnnotations
 
-		mapView.removeAnnotations(mapView.annotations)
-		mapView.addAnnotations(currentAnnotations)
+		view.transition {
+			self.mapView.removeAnnotations(self.mapView.annotations)
+			self.mapView.addAnnotations(self.currentAnnotations)
+		}
 
-		regionContainerController.regionController.region = nil
-		regionContainerController.regionController.update()
+		regionPanelController.regionDataController.region = nil
+		regionPanelController.regionDataController.update()
 	}
 
 	func downloadIfNeeded() {
@@ -161,11 +175,11 @@ class MapController: UIViewController {
 		if showSpinner {
 			showHUD(message: L10n.Data.updating)
 		}
-		regionContainerController.isUpdating = true
+		regionPanelController.isUpdating = true
 
 		DataManager.instance.download { success in
 			DispatchQueue.main.async {
-				self.regionContainerController.isUpdating = false
+				self.regionPanelController.isUpdating = false
 
 				if success {
 					self.hideHUD()
@@ -214,16 +228,16 @@ class MapController: UIViewController {
 	@IBAction func buttonModeTapped(_ sender: Any) {
 		Menu.show(above: self, sourceView: buttonMode, width: 150, items: [
 			MenuItem(title: L10n.Case.confirmed, image: nil, selected: mode == .confirmed, action: {
-				self.view.transition { self.mode = .confirmed }
+				self.mode = .confirmed
 			}),
 			MenuItem(title: L10n.Case.active, image: nil, selected: mode == .active, action: {
-				self.view.transition { self.mode = .active }
+				self.mode = .active
 			}),
 			MenuItem(title: L10n.Case.recovered, image: nil, selected: mode == .recovered, action: {
-				self.view.transition { self.mode = .recovered }
+				self.mode = .recovered
 			}),
 			MenuItem(title: L10n.Case.deaths, image: nil, selected: mode == .deaths, action: {
-				self.view.transition { self.mode = .deaths }
+				self.mode = .deaths
 			}),
 		])
 	}
@@ -267,23 +281,27 @@ extension MapController: MKMapViewDelegate {
 
 		if mapView.zoomLevel > Self.cityZoomLevel {
 			if currentAnnotations.count != allAnnotations.count {
-				annotationToSelect = mapView.selectedAnnotations.first
-				mapView.removeAnnotations(mapView.annotations)
-				currentAnnotations = allAnnotations
-				mapView.addAnnotations(currentAnnotations)
+				view.transition {
+					annotationToSelect = mapView.selectedAnnotations.first
+					mapView.removeAnnotations(mapView.annotations)
+					self.currentAnnotations = self.allAnnotations
+					mapView.addAnnotations(self.currentAnnotations)
+				}
 			}
 		}
 		else {
 			if currentAnnotations.count != countryAnnotations.count {
-				annotationToSelect = mapView.selectedAnnotations.first
-				mapView.removeAnnotations(mapView.annotations)
-				currentAnnotations = countryAnnotations
-				mapView.addAnnotations(currentAnnotations)
+				view.transition {
+					annotationToSelect = mapView.selectedAnnotations.first
+					mapView.removeAnnotations(mapView.annotations)
+					self.currentAnnotations = self.countryAnnotations
+					mapView.addAnnotations(self.currentAnnotations)
+				}
 			}
 		}
 
 		if let region = (annotationToSelect as? RegionAnnotation)?.region {
-			selectAnnotation(for: region)
+			selectAnnotation(for: region, onlyIfVisible: true)
 		}
 	}
 
@@ -306,11 +324,11 @@ extension MapController: FloatingPanelControllerDelegate {
 		let currentPosition = vc.position
 
 		// currentPosition == .full means deceleration will start from top to bottom (i.e. user dragging the panel down)
-		if currentPosition == .full, regionContainerController.isSearching {
+		if currentPosition == .full, regionPanelController.isSearching {
 			// Reset to region container's default mode then hide the keyboard
-			self.regionContainerController.isSearching = false
-        }
-    }
+			self.regionPanelController.isSearching = false
+		}
+	}
 }
 
 class PanelLayout: FloatingPanelLayout {

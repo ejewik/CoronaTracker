@@ -51,13 +51,13 @@ class HistoryChartView: LineChartView {
 		legend.xEntrySpace = 10
 	}
 
-	func update(series: TimeSeries?) {
+	func update(series: TimeSeries?, animated: Bool) {
 		guard let series = series else {
 			data = nil
 			return
 		}
 
-		let dates = series.series.keys.sorted()
+		let dates = series.series.keys.sorted().drop { series.series[$0]?.isZero == true }
 		let confirmedEntries = dates.map {
 			ChartDataEntry(x: Double($0.referenceDays), y: Double(series.series[$0]?.confirmedCount ?? 0))
 		}
@@ -80,7 +80,7 @@ class HistoryChartView: LineChartView {
 			dataSet.colors = [colors[i]]
 
 //			dataSet.drawCirclesEnabled = false
-			dataSet.circleRadius = 2.5
+			dataSet.circleRadius = confirmedEntries.count < 60 ? 3 : 2
 			dataSet.circleColors = [colors[i].withAlphaComponent(0.75)]
 
 			dataSet.drawCircleHoleEnabled = false
@@ -94,6 +94,8 @@ class HistoryChartView: LineChartView {
 
 		data = LineChartData(dataSets: dataSets)
 
-		animate(xAxisDuration: 2)
+		if animated {
+			animate(xAxisDuration: 2)
+		}
 	}
 }

@@ -29,9 +29,9 @@ public class JHURepoDataService: DataService {
 
 	private static let baseURL = URL(string: "https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/")!
 	private static let dailyReportURLString = "csse_covid_19_daily_reports/%@.csv"
-	private static let confirmedTimeSeriesURL = URL(string: "csse_covid_19_time_series/time_series_19-covid-Confirmed.csv", relativeTo: baseURL)!
-	private static let recoveredTimeSeriesURL = URL(string: "csse_covid_19_time_series/time_series_19-covid-Recovered.csv", relativeTo: baseURL)!
-	private static let deathsTimeSeriesURL = URL(string: "csse_covid_19_time_series/time_series_19-covid-Deaths.csv", relativeTo: baseURL)!
+	private static let confirmedTimeSeriesURL = URL(string: "csse_covid_19_time_series/time_series_covid19_confirmed_global.csv", relativeTo: baseURL)!
+	private static let recoveredTimeSeriesURL = URL(string: "csse_covid_19_time_series/time_series_covid19_recovered_global.csv", relativeTo: baseURL)!
+	private static let deathsTimeSeriesURL = URL(string: "csse_covid_19_time_series/time_series_covid19_deaths_global.csv", relativeTo: baseURL)!
 
 	public func fetchReports(completion: @escaping FetchResultBlock) {
 		let today = Date()
@@ -153,19 +153,26 @@ public class JHURepoDataService: DataService {
 		let dateStrings = headers.dropFirst(4)
 
 		var regions: [Region] = []
-		for row in confirmed.indices {
-			let confirmedTimeSeries = confirmed[row]
-			let recoveredTimeSeries = recovered[row]
-			let deathsTimeSeries = deaths[row]
+		for confirmedTimeSeries in confirmed {
+			let recoveredTimeSeries = recovered.first { $0.region == confirmedTimeSeries.region }
+			let deathsTimeSeries = deaths.first { $0.region == confirmedTimeSeries.region }
 
 			var series: [Date : Statistic] = [:]
 			for column in confirmedTimeSeries.values.indices {
 				let dateString = dateStrings[dateStrings.startIndex + column]
 				if let date = dateFormatter.date(from: dateString) {
+					var recoveredCount = 0
+					if let recoveredTimeSeries = recoveredTimeSeries {
+						recoveredCount = recoveredTimeSeries.values[min(column, recoveredTimeSeries.values.count - 1)]
+					}
+					var deathCount = 0
+					if let deathsTimeSeries = deathsTimeSeries {
+						deathCount = deathsTimeSeries.values[min(column, deathsTimeSeries.values.count - 1)]
+					}
 					let stat = Statistic(
 						confirmedCount: confirmedTimeSeries.values[column],
-						recoveredCount: recoveredTimeSeries.values[column],
-						deathCount: deathsTimeSeries.values[column]
+						recoveredCount: recoveredCount,
+						deathCount: deathCount
 					)
 					series[date] = stat
 				}

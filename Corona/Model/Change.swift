@@ -37,12 +37,20 @@ extension Change {
 	}
 
 	public var newConfirmedString: String { "+\(newConfirmed.groupingFormatted)" }
-	public var newRecoveredString: String { "+\(newRecovered.groupingFormatted)" }
+	public var newRecoveredString: String { currentRecovered == 0 ? "-" : "+\(newRecovered.groupingFormatted)" }
 	public var newDeathsString: String { "+\(newDeaths.groupingFormatted)" }
 
 	public var confirmedGrowthString: String { "↑\(confirmedGrowthPercent.kmFormatted)%" }
-	public var recoveredGrowthString: String { "↑\(recoveredGrowthPercent.kmFormatted)%" }
+	public var recoveredGrowthString: String { currentRecovered == 0 ? "-" : "↑\(recoveredGrowthPercent.kmFormatted)%" }
 	public var deathsGrowthString: String { "↑\(deathsGrowthPercent.kmFormatted)%" }
+
+	public var isZero: Bool { newConfirmed == 0 && newRecovered == 0 && newDeaths == 0 }
+}
+
+extension Change: CustomStringConvertible {
+	public var description: String {
+		"Change: \(newConfirmedString) | \(newRecoveredString) | \(newDeathsString)"
+	}
 }
 
 extension Change {

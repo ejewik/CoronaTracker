@@ -12,7 +12,13 @@ extension Locale {
 	public static let posix = Locale(identifier: "en_US_POSIX")
 
 	static func isoCode(from englishCountryName: String) -> String? {
-		Locale.isoRegionCodes.first { code in
+		if let pair = YAMLFiles.isoCountryNames
+			.compactMapValues({ $0 as? [String] })
+			.first(where: { $0.value.contains(englishCountryName) }) {
+			return pair.key
+		}
+
+		return Locale.isoRegionCodes.first { code in
 			code == englishCountryName || posix.localizedString(forRegionCode: code) == englishCountryName
 		}
 	}
@@ -29,6 +35,7 @@ extension Calendar {
 	public static let posix: Calendar = {
 		var calendar = Calendar(identifier: .gregorian)
 		calendar.locale = .posix
+		calendar.timeZone = .utc
 		return calendar
 	}()
 }
@@ -105,7 +112,7 @@ extension TimeZone {
 
 extension Double {
 	public var kmFormatted: String {
-		if self >= 10_000, self < 1_000_000 {
+		if self >= 1_000, self < 1_000_000 {
 			return String(format: "%.1fk", locale: .posix, self / 1_000).replacingOccurrences(of: ".0", with: "")
 		}
 
