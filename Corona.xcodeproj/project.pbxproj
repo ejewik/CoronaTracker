@@ -77,7 +77,7 @@
 		344ED322241AC7AA004C4EA8 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 344ED321241AC7AA004C4EA8 /* NotificationCenter.framework */; };
 		344ED32C241AC7AA004C4EA8 /* Widget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 344ED31F241AC7AA004C4EA8 /* Widget.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		344ED333241ACCC9004C4EA8 /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 344ED324241AC7AA004C4EA8 /* TodayViewController.swift */; };
-<<<<<<< HEAD
+
 		4B403EC8242ADBAC0020F788 /* Corona_Tracker_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B403EC7242ADBAC0020F788 /* Corona_Tracker_Tests.swift */; };
 /* End PBXBuildFile section */
 
@@ -98,14 +98,13 @@
 		};
 /* End PBXContainerItemProxy section */
 
-=======
+
 		CDA50DE0242C7D330055BE4A /* CSV in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 115186B3241FB00000EBC83E /* CSV */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		CDA50DE2242C7D350055BE4A /* Disk in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 115186B0241FAFF300EBC83E /* Disk */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		CDA50DE3242C7D3C0055BE4A /* CSV in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 115186B7241FB04200EBC83E /* CSV */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		CDA50DE5242C7D3D0055BE4A /* Disk in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 115186B5241FB03F00EBC83E /* Disk */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
->>>>>>> 6c264115ac9503a7e2eda2ae318d1ee812ddfafb
 /* Begin PBXCopyFilesBuildPhase section */
 		344ED32D241AC7AA004C4EA8 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -202,14 +201,13 @@
 		344ED321241AC7AA004C4EA8 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
 		344ED324241AC7AA004C4EA8 /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
 		344ED329241AC7AA004C4EA8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-<<<<<<< HEAD
+
 		48207FE3242833F900BC84B4 /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		48C8B39C2428307D00E182DA /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		4B403EC5242ADBAC0020F788 /* Corona Tracker Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Corona Tracker Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B403EC7242ADBAC0020F788 /* Corona_Tracker_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Corona_Tracker_Tests.swift; sourceTree = "<group>"; };
 		4B403EC9242ADBAC0020F788 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-=======
->>>>>>> 6c264115ac9503a7e2eda2ae318d1ee812ddfafb
+
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -681,7 +679,7 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-<<<<<<< HEAD
+
 /* Begin PBXTargetDependency section */
 		344ED32B241AC7AA004C4EA8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -696,8 +694,8 @@
 		};
 /* End PBXTargetDependency section */
 
-=======
->>>>>>> 6c264115ac9503a7e2eda2ae318d1ee812ddfafb
+
+
 /* Begin PBXVariantGroup section */
 		117C84DD2427E3E200688459 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
